@@ -19,4 +19,5 @@ interface MovieInfoOpenApiService {
         @Query("targetDt")target: String?
     ) : Call<Result>
 
+
 }
