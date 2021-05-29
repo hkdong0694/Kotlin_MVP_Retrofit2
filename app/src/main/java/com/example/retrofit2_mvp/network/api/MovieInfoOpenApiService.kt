@@ -1,6 +1,7 @@
-package com.example.retrofit2_mvp.network
+package com.example.retrofit2_mvp.network.api
 
-import com.example.retrofit2_mvp.network.model.Result
+import com.example.retrofit2_mvp.network.Constants.BOX_OFFICE_URL
+import com.example.retrofit2_mvp.network.model.dto.Result
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -13,7 +14,7 @@ import retrofit2.http.Query
  */
 interface MovieInfoOpenApiService {
 
-    @GET("/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json")
+    @GET(BOX_OFFICE_URL)
     fun getBoxOffice(
         @Query("key")key: String,
         @Query("targetDt")target: String?

@@ -1,4 +1,4 @@
-package com.example.retrofit2_mvp.network.model
+package com.example.retrofit2_mvp.network.model.dto
 
 /**
  * Retrofit2_MVP

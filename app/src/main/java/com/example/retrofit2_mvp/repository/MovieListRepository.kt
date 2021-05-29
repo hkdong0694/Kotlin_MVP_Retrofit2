@@ -1,7 +1,7 @@
 package com.example.retrofit2_mvp.repository
 
 import com.example.retrofit2_mvp.network.Constants
-import com.example.retrofit2_mvp.network.MovieInfoOpenApiService
+import com.example.retrofit2_mvp.network.api.MovieInfoOpenApiService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

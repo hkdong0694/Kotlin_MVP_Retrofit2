@@ -16,4 +16,6 @@ object Constants {
     val MovieDB_Service_key = "A47D7T5Y5C99GRB77608"
     val MovieDB_collection = "kmdb_new"
 
+    const val BOX_OFFICE_URL = "/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json"
+
 }

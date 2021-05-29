@@ -7,7 +7,7 @@ import android.widget.RatingBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.retrofit2_mvp.R
-import com.example.retrofit2_mvp.network.model.DailyBoxOfficeList
+import com.example.retrofit2_mvp.network.model.dto.DailyBoxOfficeList
 
 /**
  * Retrofit2_MVP

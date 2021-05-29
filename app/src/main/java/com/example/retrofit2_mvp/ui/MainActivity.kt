@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.retrofit2_mvp.R
 import com.example.retrofit2_mvp.adapter.DailyOfficeAdapter
-import com.example.retrofit2_mvp.network.model.DailyBoxOfficeList
+import com.example.retrofit2_mvp.network.model.dto.DailyBoxOfficeList
 import com.example.retrofit2_mvp.ui.contract.MainContract
 import com.example.retrofit2_mvp.ui.presenter.MainPresenter
 import kotlinx.android.synthetic.main.activity_main.*
@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         dateInit()
-        mPresenter = MainPresenter()
+        mPresenter = MainPresenter(this)
         mPresenter?.setView(this)
         adapter = DailyOfficeAdapter()
         rv_main.layoutManager = LinearLayoutManager(this)

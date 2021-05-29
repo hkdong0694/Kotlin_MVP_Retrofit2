@@ -1,6 +1,6 @@
 package com.example.retrofit2_mvp.ui.contract
 
-import com.example.retrofit2_mvp.network.model.DailyBoxOfficeList
+import com.example.retrofit2_mvp.network.model.dto.DailyBoxOfficeList
 
 /**
  * Retrofit2_MVP
