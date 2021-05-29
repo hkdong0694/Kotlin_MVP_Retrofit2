@@ -3,6 +3,73 @@ Retrofit2 +  MVP 영화진흥원 오픈 API Sample 예제
 
 ## MVP ( Model, View, Presenter )
 
+### APIRepository 및 NetworkCallback 을 만들어준다..
+
+## ApiRepository, Networkcallback.kt
+
+~~~kotlin
+
+class ApiRepository<T> {
+
+    var retrofit: Retrofit?= null
+    var apiInterface: T?= null
+    var interceptor: HttpLoggingInterceptor?= null
+
+    fun initBuild(context: Context, service : Class<T>) : T {
+        interceptor = HttpLoggingInterceptor()
+        interceptor?.level = HttpLoggingInterceptor.Level.BODY
+        var builder = OkHttpClient.Builder()
+        builder.addInterceptor(interceptor)
+        var client = builder.build()
+        retrofit = Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create() )
+            .baseUrl(Constants.BASE_URL)
+            .client(client).build()
+        apiInterface = retrofit?.create(service)
+        return (apiInterface as T)
+    }
+
+
+}
+
+abstract class NetworkCallback<T> : Callback<T?> {
+    abstract fun onSuccess(responseBody: T?) // 조회 성공
+    abstract fun onFailure(code: Int, msg: String?) // 조회 실패
+    abstract fun onThrowable(t: Throwable?) // Throwable 실패
+    abstract fun errorResponse(response: Response<*>?) // 서버 오류
+
+
+    override fun onResponse(call: Call<T?>, response: Response<T?>) {
+        if (null != response) {
+            if (response.isSuccessful) {
+                // 조회 성공
+                onSuccess(response.body())
+            } else {
+                when (response.code()) {
+                    RESPONSE_AUTHENTICATION_FAILURE,
+                    RESPONSE_UNAUTHORIZED,
+                    RESPONSE_NOT_FOUND,
+                    RESPONSE_INVALID_PARAMETER,
+                    RESPONSE_PARAMETER_ERROR -> onFailure(
+                        response.code(),
+                        ""
+                    )
+                    RESPONSE_INTERNAL_SERVER_ERROR ->                        // 서버 오류
+                        errorResponse(response)
+                    else -> {
+                    }
+                }
+            }
+            response.body()
+        }
+    }
+
+    override fun onFailure(call: Call<T?>, t: Throwable) {
+        onThrowable(t)
+    }
+}
+
+~~~
 
 ## MainContract ( Contract : View, Presenter Interface 관리 )
 
@@ -30,40 +97,26 @@ interface MainContract {
 
 ~~~
 
-## MovieListRepository.kt ( Model 미완성 )
+## MovieListModel.kt ( Model )
 
 ~~~kotlin
+class MovieListModel(context: Context) {
 
-class MovieListRepository {
+    var repository: ApiRepository<MovieInfoOpenApiService>? = null
+    var apiInterface: MovieInfoOpenApiService?= null
 
-    var retrofit: Retrofit?= null
-    var apiService: MovieInfoOpenApiService?= null
+    init {
+        repository = ApiRepository()
+        apiInterface = repository?.initBuild(context, MovieInfoOpenApiService::class.java )
+    }
 
-    fun initBuild(): MovieInfoOpenApiService? {
-
-        retrofit = Retrofit.Builder().baseUrl(Constants.BASE_URL).addConverterFactory(
-            GsonConverterFactory.create()).build()
-        apiService = retrofit?.create(MovieInfoOpenApiService::class.java)
-        return apiService
-
+    fun getDailyBox(targetDt: String, callback: NetworkCallback<Result>) {
+        if( null != repository && null != apiInterface && null != callback ) {
+            var request = DailyMovieRequest(Constants.KEY, targetDt)
+            apiInterface?.getBoxOffice(Constants.KEY, targetDt)?.enqueue(callback)
+        }
     }
 }
-
-interface MovieInfoOpenApiService {
-
-    @GET("/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json")
-    fun getBoxOffice(
-        @Query("key")key: String,
-        @Query("targetDt")target: String?
-    ) : Call<Result>
-
-}
-
-
-data class Result(
-    var boxOfficeResult: BoxOfficeResult
-) : Serializable
-
 ~~~
 
 
@@ -71,29 +124,43 @@ data class Result(
 
 ~~~kotlin
 
-class MainPresenter : MainContract.Presenter {
+class MainPresenter(context: Context) : MainContract.Presenter {
+
+    private var mContext: Context?= null
+
+    init {
+        mContext = context
+    }
 
     private var view: MainContract.View?=null
-    private var apiService: MovieInfoOpenApiService?= null
+    private var model: MovieListModel?= null
 
     override fun setView(view: MainContract.View) {
         this.view = view
-        apiService = MovieListRepository().initBuild()
+        model = mContext?.let { MovieListModel(it) }
     }
 
     override fun getBoxOfficeList(dateSet: String) {
-        apiService?.getBoxOffice(Constants.KEY, dateSet)?.enqueue(object: Callback, retrofit2.Callback<Result> {
-            override fun onResponse(call: Call<Result>, response: Response<Result>) {
-                val body = response.body()
-                val list : MutableList<DailyBoxOfficeList>? = body?.boxOfficeResult?.dailyBoxOfficeList
-                if(list != null) view?.getListSuccess(list)
+
+        model?.getDailyBox(dateSet, object :Callback, NetworkCallback<Result>() {
+            override fun onSuccess(responseBody: Result?) {
+                val body = responseBody?.boxOfficeResult?.dailyBoxOfficeList
+                if(body != null) view?.getListSuccess(body)
             }
 
-            override fun onFailure(call: Call<Result>, t: Throwable) {
-                view?.getListFail(t.message)
-                t.printStackTrace()
+            override fun onFailure(code: Int, msg: String?) {
+                view?.getListFail(msg)
+            }
+
+            override fun onThrowable(t: Throwable?) {
+                view?.getListFail(t?.message)
+            }
+
+            override fun errorResponse(response: Response<*>?) {
+                view?.getListFail(response?.message())
             }
         })
+
     }
 
 }
