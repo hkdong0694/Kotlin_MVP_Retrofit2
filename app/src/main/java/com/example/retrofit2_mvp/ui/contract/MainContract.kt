@@ -1,5 +1,7 @@
 package com.example.retrofit2_mvp.ui.contract
 
+import com.example.retrofit2_mvp.network.model.DailyBoxOfficeList
+
 /**
  * Retrofit2_MVP
  * Class: MainContract
@@ -10,10 +12,18 @@ interface MainContract {
 
     interface View {
 
+        fun getListSuccess(list: MutableList<DailyBoxOfficeList>?)
+
+        fun getListFail(message: String?)
+
     }
 
     interface Presenter {
+
         fun setView(view: View)
+
+        fun getBoxOfficeList(dataSet: String)
+
     }
 
 }
