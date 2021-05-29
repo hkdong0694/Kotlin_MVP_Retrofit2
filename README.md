@@ -28,6 +28,8 @@ interface MainContract {
 
 }
 
+~~~
+
 ## MovieListRepository.kt ( Model 미완성 )
 
 ~~~kotlin
