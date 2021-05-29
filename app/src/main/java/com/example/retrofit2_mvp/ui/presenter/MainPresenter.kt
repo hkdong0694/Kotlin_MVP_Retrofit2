@@ -1,15 +1,10 @@
 package com.example.retrofit2_mvp.ui.presenter
 
 import android.content.Context
-import com.example.retrofit2_mvp.network.Constants
-import com.example.retrofit2_mvp.network.api.MovieInfoOpenApiService
 import com.example.retrofit2_mvp.network.model.MovieListModel
-import com.example.retrofit2_mvp.network.model.dto.DailyBoxOfficeList
 import com.example.retrofit2_mvp.network.model.dto.Result
-import com.example.retrofit2_mvp.repository.MovieListRepository
 import com.example.retrofit2_mvp.repository.NetworkCallback
 import com.example.retrofit2_mvp.ui.contract.MainContract
-import retrofit2.Call
 import retrofit2.Response
 import javax.security.auth.callback.Callback
 
@@ -21,18 +16,15 @@ import javax.security.auth.callback.Callback
  */
 class MainPresenter(context: Context) : MainContract.Presenter {
 
-    private var mContext: Context?= null
-
-    init {
-        mContext = context
-    }
-
     private var view: MainContract.View?=null
     private var model: MovieListModel?= null
 
+    init {
+        model = MovieListModel(context)
+    }
+
     override fun setView(view: MainContract.View) {
         this.view = view
-        model = mContext?.let { MovieListModel(it) }
     }
 
     override fun getBoxOfficeList(dateSet: String) {

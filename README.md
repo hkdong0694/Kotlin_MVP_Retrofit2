@@ -3,8 +3,6 @@ Retrofit2 +  MVP 영화진흥원 오픈 API Sample 예제
 
 ## MVP ( Model, View, Presenter )
 
-### APIRepository 및 NetworkCallback 을 만들어준다..
-
 ## ApiRepository, Networkcallback.kt
 
 ~~~kotlin
@@ -126,18 +124,15 @@ class MovieListModel(context: Context) {
 
 class MainPresenter(context: Context) : MainContract.Presenter {
 
-    private var mContext: Context?= null
-
-    init {
-        mContext = context
-    }
-
     private var view: MainContract.View?=null
     private var model: MovieListModel?= null
 
+    init {
+        model = MovieListModel(context)
+    }
+
     override fun setView(view: MainContract.View) {
         this.view = view
-        model = mContext?.let { MovieListModel(it) }
     }
 
     override fun getBoxOfficeList(dateSet: String) {
